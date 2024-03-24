@@ -9,6 +9,26 @@
 #define INC_STM32F4XX_H_
 
 #include <stdint.h>
+///////////// Processor Specific Details ( STM32F407VG uses ARM CORTEX MX ) ///////////////////////
+// NVIC ISERx Register Addresses //
+#define NVIC_ISER0					((volatile uint32_t*) 0xE000E100U)
+#define NVIC_ISER1					((volatile uint32_t*) 0xE000E104U)
+#define NVIC_ISER2					((volatile uint32_t*) 0xE000E108U)
+#define NVIC_ISER3					((volatile uint32_t*) 0xE000E10CU)
+/* TO DO: There are 7 in total */
+
+// NVIC ICERx Register Addresses //
+#define NVIC_ICER0					((volatile uint32_t*) 0xE000E180U)
+#define NVIC_ICER1					((volatile uint32_t*) 0xE000E184U)
+#define NVIC_ICER2					((volatile uint32_t*) 0xE000E188U)
+#define NVIC_ICER3					((volatile uint32_t*) 0xE000E18CU)
+/* TO DO: Do others */
+
+// NVIC Priority Register Address //
+#define NVIC_PR_BASE_ADDR 	((volatile uint32_t*)0xE000E400)
+
+#define NO_PR_BITS_IMPLEMENTED			4 					//Number of priority bits implemented in Priority register
+
 
 // Base addresses of FLASH and SRAM memories //
 #define FLASH_BASEADDR				0x08000000U 			//FLASH address starts at here
@@ -46,8 +66,8 @@
 #define TIM13_BASEADDR				0x40001C00U
 #define TIM14_BASEADDR				0x40002000U
 #define SPI2_BASEADDR				0x40003800U
-#define I2S2_BASEADDR				SPI2_BASEADDR
-#define SPI3_BASEADDR				0x40003C00U
+#define I2S2_BASEADDR				SPI2_BASEADDR 			// I2S2 and SPI2 shares same address
+#define SPI3_BASEADDR				0x40003C00U				// I2S3 and SPI3 shares same address
 #define I2S3_BASEADDR				SPI3_BASEADDR
 #define USART2_BASEADDR				0x40004400U
 #define USART3_BASEADDR 			0x40004800U
@@ -76,15 +96,15 @@
 typedef struct
 {
 	volatile uint32_t MODER;		//Input,Output,Alternate and Analog Mode Register//
-	volatile uint32_t OTYPER;	//Output Type Register ( push-pull or open-drain)//
-	volatile uint32_t OSPEEDR;	//Output Speed Register//
+	volatile uint32_t OTYPER;		//Output Type Register ( push-pull or open-drain)//
+	volatile uint32_t OSPEEDR;		//Output Speed Register//
 	volatile uint32_t PUPDR;		//Pull-up/down Register//
-	volatile uint32_t IDR;		//Input Data Register(read-only)//
-	volatile uint32_t ODR;		//Output Data Register(R/W)//
-	volatile uint32_t BSRR;		//Port Set/Reset Register//
-	volatile uint32_t LCKR;		//Port Lock Register//
-	volatile uint32_t AFRL;		//Alternate Function Register ( for 0-7 ports)//
-	volatile uint32_t AFRH;		//Alternate Function Register ( for 8-15 ports)//
+	volatile uint32_t IDR;			//Input Data Register(read-only)//
+	volatile uint32_t ODR;			//Output Data Register(R/W)//
+	volatile uint32_t BSRR;			//Port Set/Reset Register//
+	volatile uint32_t LCKR;			//Port Lock Register//
+	volatile uint32_t AFRL;			//Alternate Function Register ( for 0-7 ports)//
+	volatile uint32_t AFRH;			//Alternate Function Register ( for 8-15 ports)//
 
 }GPIO_RegDef_t;
 
@@ -102,7 +122,7 @@ typedef struct
 	volatile uint32_t APB1RSTR;		//APB1 peripheral reset register//
 	volatile uint32_t APB2RSTR;		//APB2 peripheral reset register//
 	uint32_t RESERVED1;
-    uint32_t RESERVED2;
+	uint32_t RESERVED2;
 	volatile uint32_t AHB1ENR;		//AHB1 peripheral clock enable register//
 	volatile uint32_t AHB2ENR;		//AHB2 peripheral clock enable register//
 	volatile uint32_t AHB3ENR;		//AHB3 peripheral clock enable register//
@@ -128,6 +148,25 @@ typedef struct
 
 }RCC_RegDef_t;
 
+typedef struct
+{
+	volatile uint32_t IMR;			//Interrupt mask register//
+	volatile uint32_t EMR;			//Event mask register//
+	volatile uint32_t RTSR;			//Rising trigger selection register//
+	volatile uint32_t FTSR;			//Falling trigger selection register//
+	volatile uint32_t SWIER;		//Software interrupt event register//
+	volatile uint32_t PR;			//Pending register//
+
+}EXTI_RegDef_t;
+
+typedef struct
+{
+	volatile uint32_t MEMRMP;		//Memory remap register//
+	volatile uint32_t PMC;			//Peripheral mode configuration register//
+	volatile uint32_t EXTICR[4];	//External interrupt configuration register//
+	volatile uint32_t CMPCR;		//Compensation cell control register//
+
+}SYSCFG_RegDef_t;
 
 // Peripheral Definitions ( Base addresses -> xxx_RegDef_t ) //
 #define GPIOA 			((GPIO_RegDef_t*) GPIOA_BASEADDR)
@@ -140,6 +179,8 @@ typedef struct
 #define GPIOH 			((GPIO_RegDef_t*) GPIOH_BASEADDR)
 #define GPIOI 			((GPIO_RegDef_t*) GPIOI_BASEADDR)
 #define RCC				((RCC_RegDef_t*) RCC_BASEADDR)
+#define EXTI			((EXTI_RegDef_t*) EXTI_BASEADDR)
+#define SYSCFG			((SYSCFG_RegDef_t*) SYSCFG_BASEADDR)
 
 // Clock Enable Macros for GPIOx peripherals //
 #define GPIOA_CLK_EN()		(RCC->AHB1ENR |= (1<<0)) // turns AHB1ENR's bit 0 to 1 ( bit 0 control GPIOA )
@@ -205,13 +246,68 @@ typedef struct
 // Clock Disable Macro for SYSCFG peripheral //
 #define SYSCFG_CLK_DI()		(RCC->APB2ENR &= ~(1<<14))
 
+// Macros to Reset GPIOx peripherals //
+/* First we set the register and then reset it */
+/* "do ... while..." condition is a technique in "C" programming to execute multiple "C" statements using single "C" macro */
+/* Don't put semi-colon ";" after while(0) because when we call this macro, there is a semi-colon at there */
+#define GPIOA_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 0));	(RCC->AHB1RSTR &= ~(1 << 0));}while(0)
+#define GPIOB_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 1));	(RCC->AHB1RSTR &= ~(1 << 1));}while(0)
+#define GPIOC_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 2));	(RCC->AHB1RSTR &= ~(1 << 2));}while(0)
+#define GPIOD_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 3));	(RCC->AHB1RSTR &= ~(1 << 3));}while(0)
+#define GPIOE_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 4));	(RCC->AHB1RSTR &= ~(1 << 4));}while(0)
+#define GPIOF_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 5));	(RCC->AHB1RSTR &= ~(1 << 5));}while(0)
+#define GPIOG_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 6));	(RCC->AHB1RSTR &= ~(1 << 6));}while(0)
+#define GPIOH_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 7));	(RCC->AHB1RSTR &= ~(1 << 7));}while(0)
+#define GPIOI_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 8));	(RCC->AHB1RSTR &= ~(1 << 8));}while(0)
+
+// Port Code for given GPIOx Base Address //
+#define GPIO_BASEADDR_TO_CODE(x)	  ( (x == GPIOA) ? 0 :\
+										(x == GPIOB) ? 1 :\
+										(x == GPIOC) ? 2 :\
+										(x == GPIOD) ? 3 :\
+										(x == GPIOE) ? 4 :\
+										(x == GPIOF) ? 5 :\
+										(x == GPIOG) ? 6 :\
+										(x == GPIOH) ? 7 :\
+										(x == GPIOI) ? 8 :0 ) // this basically checks for wanted GPIOx and if not, checks other GPIOx ports
+															  // and after that returns to 1-2-3-4... and so on for that GPIOx port
+															  // this is called conditional or ternary operators used in 'C'
+
+
+//IRQ(Interrupt Request) Numbers //
+#define IRQ_NO_EXTI0 			6
+#define IRQ_NO_EXTI1 			7
+#define IRQ_NO_EXTI2 			8
+#define IRQ_NO_EXTI3 			9
+#define IRQ_NO_EXTI4 			10
+#define IRQ_NO_EXTI9_5 			23
+#define IRQ_NO_EXTI15_10 		40
+
+//IRQ Priority Macros //
+#define NVIC_IRQ_PRI0			0
+#define NVIC_IRQ_PRI1			1
+#define NVIC_IRQ_PRI2			2
+#define NVIC_IRQ_PRI3			3
+#define NVIC_IRQ_PRI4			4
+#define NVIC_IRQ_PRI5			5
+#define NVIC_IRQ_PRI6			6
+#define NVIC_IRQ_PRI7			7
+#define NVIC_IRQ_PRI8			8
+#define NVIC_IRQ_PRI9			9
+#define NVIC_IRQ_PRI10			10
+#define NVIC_IRQ_PRI11			11
+#define NVIC_IRQ_PRI12			12
+#define NVIC_IRQ_PRI13			13
+#define NVIC_IRQ_PRI14			14
+#define NVIC_IRQ_PRI15			15
+
 // General Macros
-#define ENABLE 				1
-#define DISABLE 			0
-#define SET					ENABLE
-#define RESET				DISABLE
-#define GPIO_PIN_SET		SET
-#define GPIO_PIN_RESET		RESET
+#define ENABLE 					1
+#define DISABLE 				0
+#define SET						ENABLE
+#define RESET					DISABLE
+#define GPIO_PIN_SET			SET
+#define GPIO_PIN_RESET			RESET
 
 
 #endif /* INC_STM32F4XX_H_ */

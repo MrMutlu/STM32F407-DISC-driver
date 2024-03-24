@@ -11,8 +11,7 @@
 #include "stm32f4xx.h"
 
 // Configuration Structure for a GPIO pin //
-typedef struct
-{
+typedef struct {
 	// uint8_t used because they are usually small bits (0-15)//
 	uint8_t GPIO_PinNumber;				// @GPIO_PinNumbers
 	uint8_t GPIO_PinMode;				// @GPIO_PinModes
@@ -21,15 +20,14 @@ typedef struct
 	uint8_t GPIO_PinOutType;			// @GPIO_PinOutTypes
 	uint8_t GPIO_PinAltFuncMode;
 
-}GPIO_Pin_Config_t;
+} GPIO_Pin_Config_t;
 
 // Handle Structure for a GPIO pin //
-typedef struct
-{
-	GPIO_RegDef_t *pGPIOx;	// This holds the base address of the GPIO port to which the pin belongs //
+typedef struct {
+	GPIO_RegDef_t *pGPIOx;// This holds the base address of the GPIO port to which the pin belongs //
 	GPIO_Pin_Config_t GPIO_PinConfig; // This holds GPIO pin configuration settings //
 
-}GPIO_Handle_t;
+} GPIO_Handle_t;
 
 // @GPIO_PinNumbers
 // GPIOx pin Numbers //
@@ -78,9 +76,9 @@ typedef struct
 #define GPIO_PULLUP			1
 #define GPIO_PULLDOWN		2
 
-								///////////////////////////////////
-								// APIs supported by this driver //
-								///////////////////////////////////
+///////////////////////////////////
+// APIs supported by this driver //
+///////////////////////////////////
 // Init and De-init //
 void GPIO_Init(GPIO_Handle_t *pGPIOHandle);
 void GPIO_DeInit(GPIO_RegDef_t *pGPIOx);
@@ -96,8 +94,8 @@ void GPIO_WritePort(GPIO_RegDef_t *pGPIOx, uint16_t Val);
 void GPIO_TogglePin(GPIO_RegDef_t *pGPIOx, uint8_t Pin);
 
 // IRQ Configuration and ISR handling //
-void GPIO_IRQConfig(uint8_t IRQNum, uint8_t IRQPriority, uint8_t EnOrDi);
+void GPIO_IRQInterruptConfig(uint8_t IRQNum, uint8_t EnOrDi);
+void GPIO_IRQPriorityConfig(uint8_t IRQNum, uint32_t IRQPriority);
 void GPIO_IRQHandling(uint8_t Pin);
-
 
 #endif /* INC_STM32F407_GPIO_DRIVER_H_ */
