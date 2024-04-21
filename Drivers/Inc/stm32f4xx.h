@@ -168,6 +168,21 @@ typedef struct
 
 }SYSCFG_RegDef_t;
 
+typedef struct
+{
+	volatile uint32_t CR1;			//Control-1 register//
+	volatile uint32_t CR2;			//Control-2 register//
+	volatile uint32_t SR;			//Status register//
+	volatile uint32_t DR;			//Data register//
+	volatile uint32_t CRCPR;		//CRC Polynomial register//
+	volatile uint32_t RXCRCR;		//RX CRC register register//
+	volatile uint32_t TXCRCR;		//TX CRC register register//
+	volatile uint32_t I2SCFGR;		//I2S Configuration register//
+	volatile uint32_t I2SPR;		//I2S Prescaler register//
+
+}SPI_RegDef_t;
+
+
 // Peripheral Definitions ( Base addresses -> xxx_RegDef_t ) //
 #define GPIOA 			((GPIO_RegDef_t*) GPIOA_BASEADDR)
 #define GPIOB 			((GPIO_RegDef_t*) GPIOB_BASEADDR)
@@ -181,6 +196,9 @@ typedef struct
 #define RCC				((RCC_RegDef_t*) RCC_BASEADDR)
 #define EXTI			((EXTI_RegDef_t*) EXTI_BASEADDR)
 #define SYSCFG			((SYSCFG_RegDef_t*) SYSCFG_BASEADDR)
+#define SPI1			((SPI_RegDef_t*) SPI1_BASEADDR)
+#define SPI2			((SPI_RegDef_t*) SPI2_BASEADDR)
+#define SPI3			((SPI_RegDef_t*) SPI3_BASEADDR)
 
 // Clock Enable Macros for GPIOx peripherals //
 #define GPIOA_CLK_EN()		(RCC->AHB1ENR |= (1<<0)) // turns AHB1ENR's bit 0 to 1 ( bit 0 control GPIOA )
@@ -250,15 +268,21 @@ typedef struct
 /* First we set the register and then reset it */
 /* "do ... while..." condition is a technique in "C" programming to execute multiple "C" statements using single "C" macro */
 /* Don't put semi-colon ";" after while(0) because when we call this macro, there is a semi-colon at there */
-#define GPIOA_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 0));	(RCC->AHB1RSTR &= ~(1 << 0));}while(0)
-#define GPIOB_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 1));	(RCC->AHB1RSTR &= ~(1 << 1));}while(0)
-#define GPIOC_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 2));	(RCC->AHB1RSTR &= ~(1 << 2));}while(0)
-#define GPIOD_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 3));	(RCC->AHB1RSTR &= ~(1 << 3));}while(0)
-#define GPIOE_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 4));	(RCC->AHB1RSTR &= ~(1 << 4));}while(0)
-#define GPIOF_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 5));	(RCC->AHB1RSTR &= ~(1 << 5));}while(0)
-#define GPIOG_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 6));	(RCC->AHB1RSTR &= ~(1 << 6));}while(0)
-#define GPIOH_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 7));	(RCC->AHB1RSTR &= ~(1 << 7));}while(0)
-#define GPIOI_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 8));	(RCC->AHB1RSTR &= ~(1 << 8));}while(0)
+#define GPIOA_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 0));	(RCC->AHB1RSTR &= ~(1 << 0)); }while(0)
+#define GPIOB_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 1));	(RCC->AHB1RSTR &= ~(1 << 1)); }while(0)
+#define GPIOC_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 2));	(RCC->AHB1RSTR &= ~(1 << 2)); }while(0)
+#define GPIOD_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 3));	(RCC->AHB1RSTR &= ~(1 << 3)); }while(0)
+#define GPIOE_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 4));	(RCC->AHB1RSTR &= ~(1 << 4)); }while(0)
+#define GPIOF_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 5));	(RCC->AHB1RSTR &= ~(1 << 5)); }while(0)
+#define GPIOG_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 6));	(RCC->AHB1RSTR &= ~(1 << 6)); }while(0)
+#define GPIOH_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 7));	(RCC->AHB1RSTR &= ~(1 << 7)); }while(0)
+#define GPIOI_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 8));	(RCC->AHB1RSTR &= ~(1 << 8)); }while(0)
+
+//Macros to Reset SPIx peripherals
+#define SPI1_REG_RESET()	do { (RCC->APB2RSTR |= (1 << 12));	(RCC->APB2RSTR &= ~(1 << 12)); }while(0)	/* Sets SPI1 reset pin and then Resets */
+#define SPI2_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 14));	(RCC->APB1RSTR &= ~(1 << 14)); }while(0)	/* Sets SPI2 reset pin and then Resets */
+#define SPI3_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 15));	(RCC->APB1RSTR &= ~(1 << 15)); }while(0)	/* Sets SPI3 reset pin and then Resets */
+
 
 // Port Code for given GPIOx Base Address //
 #define GPIO_BASEADDR_TO_CODE(x)	  ( (x == GPIOA) ? 0 :\
@@ -308,6 +332,44 @@ typedef struct
 #define RESET					DISABLE
 #define GPIO_PIN_SET			SET
 #define GPIO_PIN_RESET			RESET
+#define FLAG_SET				SET
+#define FLAG_RESET				RESET
+// Bit Position Definitions of SPI Peripheral //
+#define SPI_CR1_CPHA			0
+#define SPI_CR1_CPOL			1
+#define SPI_CR1_MSTR			2
+#define SPI_CR1_BR				3
+#define SPI_CR1_SPE				6
+#define SPI_CR1_LSBFIRST		7
+#define SPI_CR1_SSI				8
+#define SPI_CR1_SSM				9
+#define SPI_CR1_RXONLY			10
+#define SPI_CR1_DFF				11
+#define SPI_CR1_CRCNEXT			12
+#define SPI_CR1_CRCEN			13
+#define SPI_CR1_BIDIOE			14
+#define SPI_CR1_BIDIMODE		15
 
+#define SPI_CR2_RXDMAEN		0
+#define SPI_CR2_TXDMAEN		1
+#define SPI_CR2_SSOE		2
+#define SPI_CR2_FRF			4
+#define SPI_CR2_ERRIE		5
+#define SPI_CR2_RXNEIE		6
+#define SPI_CR2_TXEIE		7
+
+#define SPI_SR_RXNE			0
+#define SPI_SR_TXE			1
+#define SPI_SR_CHSIDE		2
+#define SPI_SR_UDR			3
+#define SPI_SR_CRCERR		4
+#define SPI_SR_MODF			5
+#define SPI_SR_OVR			6
+#define SPI_SR_BSY			7
+#define SPI_SR_FRE			8
+
+
+#include "stm32f407_gpio_driver.h"
+#include "stm32f407_spi_driver.h"
 
 #endif /* INC_STM32F4XX_H_ */
