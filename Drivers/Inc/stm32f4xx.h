@@ -9,6 +9,8 @@
 #define INC_STM32F4XX_H_
 
 #include <stdint.h>
+#include <stddef.h>
+#define __weak	__attribute__((weak))
 ///////////// Processor Specific Details ( STM32F407VG uses ARM CORTEX MX ) ///////////////////////
 // NVIC ISERx Register Addresses //
 #define NVIC_ISER0					((volatile uint32_t*) 0xE000E100U)
@@ -350,23 +352,23 @@ typedef struct
 #define SPI_CR1_BIDIOE			14
 #define SPI_CR1_BIDIMODE		15
 
-#define SPI_CR2_RXDMAEN		0
-#define SPI_CR2_TXDMAEN		1
-#define SPI_CR2_SSOE		2
-#define SPI_CR2_FRF			4
-#define SPI_CR2_ERRIE		5
-#define SPI_CR2_RXNEIE		6
-#define SPI_CR2_TXEIE		7
+#define SPI_CR2_RXDMAEN			0
+#define SPI_CR2_TXDMAEN			1
+#define SPI_CR2_SSOE			2
+#define SPI_CR2_FRF				4
+#define SPI_CR2_ERRIE			5
+#define SPI_CR2_RXNEIE			6
+#define SPI_CR2_TXEIE			7
 
-#define SPI_SR_RXNE			0
-#define SPI_SR_TXE			1
-#define SPI_SR_CHSIDE		2
-#define SPI_SR_UDR			3
-#define SPI_SR_CRCERR		4
-#define SPI_SR_MODF			5
-#define SPI_SR_OVR			6
-#define SPI_SR_BSY			7
-#define SPI_SR_FRE			8
+#define SPI_SR_RXNE				0
+#define SPI_SR_TXE				1
+#define SPI_SR_CHSIDE			2
+#define SPI_SR_UDR				3
+#define SPI_SR_CRCERR			4
+#define SPI_SR_MODF				5
+#define SPI_SR_OVR				6
+#define SPI_SR_BSY				7
+#define SPI_SR_FRE				8
 
 
 #include "stm32f407_gpio_driver.h"
