@@ -95,6 +95,10 @@
 /* TO DO: Add other APB2 peripheral addresses */
 
 /*****************PERIPHERAL REGISTER STRUCTURES********************/
+
+/*
+ *	Peripheral register definition structure for GPIO
+ */
 typedef struct
 {
 	volatile uint32_t MODER;		//Input,Output,Alternate and Analog Mode Register//
@@ -110,6 +114,9 @@ typedef struct
 
 }GPIO_RegDef_t;
 
+/*
+ *	Peripheral register definition structure for RCC
+ */
 typedef struct
 {
 	volatile uint32_t CR;			//clock control register//
@@ -150,6 +157,9 @@ typedef struct
 
 }RCC_RegDef_t;
 
+/*
+ *	Peripheral register definition structure for EXTI
+ */
 typedef struct
 {
 	volatile uint32_t IMR;			//Interrupt mask register//
@@ -161,6 +171,9 @@ typedef struct
 
 }EXTI_RegDef_t;
 
+/*
+ *	Peripheral register definition structure for SYSCFG
+ */
 typedef struct
 {
 	volatile uint32_t MEMRMP;		//Memory remap register//
@@ -170,6 +183,9 @@ typedef struct
 
 }SYSCFG_RegDef_t;
 
+/*
+ *	Peripheral register definition structure for SPI
+ */
 typedef struct
 {
 	volatile uint32_t CR1;			//Control-1 register//
@@ -184,6 +200,36 @@ typedef struct
 
 }SPI_RegDef_t;
 
+/*
+ *	Peripheral register definition structure for I2C
+ */
+typedef struct
+{
+	volatile uint32_t CR1;			/* I2C Control register 1				Address offset: 0x00 */
+	volatile uint32_t CR2;			/* I2C Control register 2				Address offset: 0x04 */
+	volatile uint32_t OAR1;			/* I2C Own address register 1			Address offset: 0x08 */
+	volatile uint32_t OAR2;			/* I2C Own address register 2			Address offset: 0x0C */
+	volatile uint32_t DR;			/* I2C Data Register					Address offset: 0x10 */
+	volatile uint32_t SR1;			/* I2C Status register 1				Address offset: 0x14 */
+	volatile uint32_t SR2;			/* I2C Status register 2				Address offset: 0x18 */
+	volatile uint32_t CCR;			/* I2C Clock control register			Address offset: 0x1C */
+	volatile uint32_t TRISE;		/* I2C TRISE register					Address offset: 0x20 */
+	volatile uint32_t FLTR;			/* I2C FLTR register					Address offset: 0x24 */
+}I2C_RegDef_t;
+
+/*
+ *	Peripheral register definition structure for USART
+ */
+typedef struct
+{
+	volatile uint32_t SR;			/* USART Status register						Address offset: 0x00 */
+	volatile uint32_t DR;			/* USART Data register							Address offset: 0x04 */
+	volatile uint32_t BRR;			/* USART Baud rate register						Address offset: 0x08 */
+	volatile uint32_t CR1;			/* USART Control register 1						Address offset: 0x0C */
+	volatile uint32_t CR2;			/* USART Control register 2						Address offset: 0x10 */
+	volatile uint32_t CR3;			/* USART Control register 3						Address offset: 0x14 */
+	volatile uint32_t GTPR;			/* USART Guard time and prescaler register		Address offset: 0x18 */
+}USART_RegDef_t;
 
 // Peripheral Definitions ( Base addresses -> xxx_RegDef_t ) //
 #define GPIOA 			((GPIO_RegDef_t*) GPIOA_BASEADDR)
@@ -201,6 +247,16 @@ typedef struct
 #define SPI1			((SPI_RegDef_t*) SPI1_BASEADDR)
 #define SPI2			((SPI_RegDef_t*) SPI2_BASEADDR)
 #define SPI3			((SPI_RegDef_t*) SPI3_BASEADDR)
+#define I2C1 			((I2C_RegDef_t*) I2C1_BASEADDR)
+#define I2C2 			((I2C_RegDef_t*) I2C2_BASEADDR)
+#define I2C3 			((I2C_RegDef_t*) I2C3_BASEADDR)
+#define USART1 			((USART_RegDef_t*) USART1_BASEADDR)
+#define USART2 			((USART_RegDef_t*) USART2_BASEADDR)
+#define USART3 			((USART_RegDef_t*) USART3_BASEADDR)
+#define UART4 			((USART_RegDef_t*) UART4_BASEADDR)
+#define UART5 			((USART_RegDef_t*) UART5_BASEADDR)
+#define USART6 			((USART_RegDef_t*) USART6_BASEADDR)
+
 
 // Clock Enable Macros for GPIOx peripherals //
 #define GPIOA_CLK_EN()		(RCC->AHB1ENR |= (1<<0)) // turns AHB1ENR's bit 0 to 1 ( bit 0 control GPIOA )
@@ -285,6 +341,19 @@ typedef struct
 #define SPI2_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 14));	(RCC->APB1RSTR &= ~(1 << 14)); }while(0)	/* Sets SPI2 reset pin and then Resets */
 #define SPI3_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 15));	(RCC->APB1RSTR &= ~(1 << 15)); }while(0)	/* Sets SPI3 reset pin and then Resets */
 
+//Macros to Reset I2Cx peripherals
+#define I2C1_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 21));	(RCC->APB1RSTR &= ~(1 << 21)); }while(0)	/* Sets I2C1 reset pin and then Resets */
+#define I2C2_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 22));	(RCC->APB1RSTR &= ~(1 << 22)); }while(0)	/* Sets I2C2 reset pin and then Resets */
+#define I2C3_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 23));	(RCC->APB1RSTR &= ~(1 << 23)); }while(0)	/* Sets I2C3 reset pin and then Resets */
+
+// Macros to Reset USARTx peripherals
+#define USART1_REG_RESET()	do { (RCC->APB2RSTR |= (1 << 4));	(RCC->APB2RSTR &= ~(1 << 4)); }	while(0)	/* Sets USART1 reset pin and then Resets */
+#define USART2_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 17));	(RCC->APB1RSTR &= ~(1 << 17)); }while(0)	/* Sets USART2 reset pin and then Resets */
+#define USART3_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 18));	(RCC->APB1RSTR &= ~(1 << 18)); }while(0)	/* Sets USART3 reset pin and then Resets */
+#define UART4_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 19));	(RCC->APB1RSTR &= ~(1 << 19)); }while(0)	/* Sets UART4 reset pin and then Resets */
+#define UART5_REG_RESET()	do { (RCC->APB1RSTR |= (1 << 20));	(RCC->APB1RSTR &= ~(1 << 20)); }while(0)	/* Sets UART5 reset pin and then Resets */
+#define USART6_REG_RESET()	do { (RCC->APB2RSTR |= (1 << 5));	(RCC->APB1RSTR &= ~(1 << 5)); }	while(0)	/* Sets USART6 reset pin and then Resets */
+
 
 // Port Code for given GPIOx Base Address //
 #define GPIO_BASEADDR_TO_CODE(x)	  ( (x == GPIOA) ? 0 :\
@@ -301,16 +370,34 @@ typedef struct
 
 
 //IRQ(Interrupt Request) Numbers //
-#define IRQ_NO_EXTI0 			6
-#define IRQ_NO_EXTI1 			7
-#define IRQ_NO_EXTI2 			8
-#define IRQ_NO_EXTI3 			9
-#define IRQ_NO_EXTI4 			10
-#define IRQ_NO_EXTI9_5 			23
-#define IRQ_NO_EXTI15_10 		40
+#define IRQ_NO_EXTI0		6		/* IRQ (Interrupt Request) number of EXTI0 */
+#define IRQ_NO_EXTI1		7		/* IRQ (Interrupt Request) number of EXTI1 */
+#define IRQ_NO_EXTI2		8		/* IRQ (Interrupt Request) number of EXTI2 */
+#define IRQ_NO_EXTI3		9		/* IRQ (Interrupt Request) number of EXTI3 */
+#define IRQ_NO_EXTI4		10		/* IRQ (Interrupt Request) number of EXTI4 */
+#define IRQ_NO_EXTI9_5		23		/* IRQ (Interrupt Request) number of EXTI5-10 */
+#define IRQ_NO_EXTI15_10	40		/* IRQ (Interrupt Request) number of EXTI10-15 */
+
+#define IRQ_NO_SPI1			35		/* IRQ (Interrupt Request) number of SPI1 */
+#define IRQ_NO_SPI2			36		/* IRQ (Interrupt Request) number of SPI2 */
+#define IRQ_NO_SPI3			51		/* IRQ (Interrupt Request) number of SPI3 */
+
+#define IRQ_NO_I2C1_EV		31		/* IRQ (Interrupt Request) number of I2C1_EV */
+#define IRQ_NO_I2C1_ER		32		/* IRQ (Interrupt Request) number of I2C1_ER */
+#define IRQ_NO_I2C2_EV		33		/* IRQ (Interrupt Request) number of I2C2_EV */
+#define IRQ_NO_I2C2_ER		34		/* IRQ (Interrupt Request) number of I2C2_EV */
+#define IRQ_NO_I2C3_EV		72		/* IRQ (Interrupt Request) number of I2C3_EV */
+#define IRQ_NO_I2C3_ER		73		/* IRQ (Interrupt Request) number of I2C3_ER */
+
+#define IRQ_NO_USART1		37		/* IRQ (Interrupt Request) number of USART1 */
+#define IRQ_NO_USART2		38		/* IRQ (Interrupt Request) number of USART2 */
+#define IRQ_NO_USART3		39		/* IRQ (Interrupt Request) number of USART3 */
+#define IRQ_NO_UART4		52		/* IRQ (Interrupt Request) number of UART4 */
+#define IRQ_NO_UART5		53		/* IRQ (Interrupt Request) number of UART5 */
+#define IRQ_NO_USART6		71		/* IRQ (Interrupt Request) number of USART6 */
 
 //IRQ Priority Macros //
-#define NVIC_IRQ_PRI0			0
+#define NVIC_IRQ_PRI0			0	// Highest priority
 #define NVIC_IRQ_PRI1			1
 #define NVIC_IRQ_PRI2			2
 #define NVIC_IRQ_PRI3			3
@@ -325,7 +412,7 @@ typedef struct
 #define NVIC_IRQ_PRI12			12
 #define NVIC_IRQ_PRI13			13
 #define NVIC_IRQ_PRI14			14
-#define NVIC_IRQ_PRI15			15
+#define NVIC_IRQ_PRI15			15	// Lowest priority
 
 // General Macros
 #define ENABLE 					1
@@ -336,7 +423,9 @@ typedef struct
 #define GPIO_PIN_RESET			RESET
 #define FLAG_SET				SET
 #define FLAG_RESET				RESET
+
 // Bit Position Definitions of SPI Peripheral //
+//SPI_CR1//
 #define SPI_CR1_CPHA			0
 #define SPI_CR1_CPOL			1
 #define SPI_CR1_MSTR			2
@@ -352,6 +441,7 @@ typedef struct
 #define SPI_CR1_BIDIOE			14
 #define SPI_CR1_BIDIMODE		15
 
+//SPI_CR2//
 #define SPI_CR2_RXDMAEN			0
 #define SPI_CR2_TXDMAEN			1
 #define SPI_CR2_SSOE			2
@@ -360,6 +450,7 @@ typedef struct
 #define SPI_CR2_RXNEIE			6
 #define SPI_CR2_TXEIE			7
 
+//SPI_SR//
 #define SPI_SR_RXNE				0
 #define SPI_SR_TXE				1
 #define SPI_SR_CHSIDE			2
@@ -370,8 +461,136 @@ typedef struct
 #define SPI_SR_BSY				7
 #define SPI_SR_FRE				8
 
+// Bit Position Definitions of I2C Peripheral //
+//I2C_CR1//
+#define I2C_CR1_PE				0
+#define I2C_CR1_SMBUS			1
+#define I2C_CR1_SMBTYPE			3
+#define I2C_CR1_ENARP			4
+#define I2C_CR1_ENPEC			5
+#define I2C_CR1_ENGC			6
+#define I2C_CR1_NOSTRETCH		7
+#define I2C_CR1_START			8
+#define I2C_CR1_STOP			9
+#define I2C_CR1_ACK				10
+#define I2C_CR1_POS				11
+#define I2C_CR1_PEC				12
+#define I2C_CR1_ALERT			13
+#define I2C_CR1_SWRST			15
 
+//I2C_CR2//
+#define I2C_CR2_FREQ			0
+#define I2C_CR2_ITERREN			8
+#define I2C_CR2_ITEVTEN			9
+#define I2C_CR2_ITBUFEN			10
+#define I2C_CR2_DMAEN			11
+#define I2C_CR2_LAST			12
+
+//I2C_OAR1//
+#define I2C_OAR1_ADD0			0
+#define I2C_OAR1_ADD7_1			1
+#define I2C_OAR1_ADD9_8			8
+#define I2C_OAR1_ADDMODE		15
+
+//I2C_SR1//
+#define I2C_SR1_SB				0
+#define I2C_SR1_ADDR			1
+#define I2C_SR1_BTF				2
+#define I2C_SR1_ADD10			3
+#define I2C_SR1_STOPF			4
+#define I2C_SR1_RXNE			6
+#define I2C_SR1_TXE				7
+#define I2C_SR1_BERR			8
+#define I2C_SR1_ARLO			9
+#define I2C_SR1_AF				10
+#define I2C_SR1_OVR				11
+#define I2C_SR1_PECERR			12
+#define I2C_SR1_TIMEOUT			14
+#define I2C_SR1_SMBALERT		15
+
+//I2C_SR2//
+#define I2C_SR2_MSL				0
+#define I2C_SR2_BUSY			1
+#define I2C_SR2_TRA				2
+#define I2C_SR2_GENCALL			4
+#define I2C_SR2_SMBDEFAULT		5
+#define I2C_SR2_SMBHOST			6
+#define I2C_SR2_DUALF			7
+#define I2C_SR2_PEC				8
+
+//I2C_CCR//
+#define I2C_CCR_CCR				0
+#define I2C_CCR_DUTY			14
+#define I2C_CCR_FS				15
+
+//Trise(max) values of I2C
+#define I2C_TRISEMAX_SM		(1000 / 1000000000U)	// 1000 ns
+#define I2C_TRISEMAX_FM		(300 / 1000000000U)		// 300 ns
+
+// Bit Position Definitions of USART Peripheral //
+#define USART_SR_PE				0
+#define USART_SR_FE				1
+#define USART_SR_NF				2
+#define USART_SR_ORE			3
+#define USART_SR_IDLE 			4
+#define USART_SR_RXNE			5
+#define USART_SR_TC				6
+#define USART_SR_TXE			7
+#define USART_SR_LBD			8
+#define USART_SR_CTS			9
+
+//Bit position definitions USART_BRR
+#define USART_BRR_DIV_FRACTION		0
+#define USART_BRR_DIV_MANTISSA		4
+
+
+//Bit position definitions USART_CR1
+#define USART_CR1_SBK			0
+#define USART_CR1_RWU			1
+#define USART_CR1_RE			2
+#define USART_CR1_TE			3
+#define USART_CR1_IDLEIE		4
+#define USART_CR1_RXNEIE		5
+#define USART_CR1_TCIE			6
+#define USART_CR1_TXEIE			7
+#define USART_CR1_PEIE			8
+#define USART_CR1_PS			9
+#define USART_CR1_PCE			10
+#define USART_CR1_WAKE			11
+#define USART_CR1_M				12
+#define USART_CR1_UE			13
+#define USART_CR1_OVER8			15
+
+
+//Bit position definitions USART_CR2
+
+#define USART_CR2_ADD			0
+#define USART_CR2_LBDL			5
+#define USART_CR2_LBDIE			6
+#define USART_CR2_LBCL			8
+#define USART_CR2_CPHA			9
+#define USART_CR2_CPOL			10
+#define USART_CR2_CLKEN			11
+#define USART_CR2_STOP			12
+#define USART_CR2_LINEN			14
+
+
+//Bit position definitions USART_CR3
+#define USART_CR3_EIE			0
+#define USART_CR3_IREN			1
+#define USART_CR3_IRLP			2
+#define USART_CR3_HDSEL			3
+#define USART_CR3_NACK			4
+#define USART_CR3_SCEN			5
+#define USART_CR3_DMAR			6
+#define USART_CR3_DMAT			7
+#define USART_CR3_RTSE			8
+#define USART_CR3_CTSE			9
+#define USART_CR3_CTSIE			10
+#define USART_CR3_ONEBIT		11
 #include "stm32f407_gpio_driver.h"
 #include "stm32f407_spi_driver.h"
-
+#include "stm32f407_i2c_driver.h"
+#include "stm32f407_rcc_driver.h"
+#include "stm32f407_usart_driver.h"
 #endif /* INC_STM32F4XX_H_ */
